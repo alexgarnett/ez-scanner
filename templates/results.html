@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <p>
+    Name: {{ results['name'] }}
+    <br>
+    Address: {{ results['address'] }}
+    <br>
+    Issuance: {{ results['issuance'] }}
+    <br>
+    Expiration: {{ results['expiration'] }}
+  </p>
+  <form action="{{ url_for('stream_page') }}">
+    <input type="submit" value="Try again">
+  </form>
+{% endblock %}

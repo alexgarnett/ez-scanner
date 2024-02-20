@@ -1,0 +1,5 @@
+*.jpg
+/venv/
+__pycache__/
+.idea/
+/Tesseract-OCR/**
