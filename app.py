@@ -94,7 +94,7 @@ def extract_data(image):
     # Filter out blank lines
     lines = []
     for line in _lines:
-        if line is not '':
+        if line != '':
             lines.append(line)
 
     exp_index = 0
