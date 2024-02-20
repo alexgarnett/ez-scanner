@@ -1,3 +1,6 @@
+const controls = document.querySelector('.controls');
+const cameraOptions = document.querySelector('.video-options>select');
+const video = document.querySelector('video');
 let streamStarted = false;
 
 const constraints = {
