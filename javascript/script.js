@@ -1,3 +1,5 @@
+let streamStarted = false;
+
 const constraints = {
   video: {
     width: {
@@ -9,10 +11,26 @@ const constraints = {
   }
 };
 
+const getCameraSelection = async () => {
+  const devices = await navigator.mediaDevices.enumerateDevices();
+  const videoDevices = devices.filter(device => device.kind === 'videoinput');
+  const options = videoDevices.map(videoDevice => {
+    return `<option value="${videoDevice.deviceId}">${videoDevice.label}</option>`;
+  });
+  cameraOptions.innerHTML = options.join('');
+};
+
 const startStream = async (constraints) => {
   const stream = await navigator.mediaDevices.getUserMedia(constraints);
   handleStream(stream);
 };
+
+const handleStream = (stream) => {
+  video.srcObject = stream;
+  streamStarted = true;
+};
+
+getCameraSelection();
 
 startStream(constraints);
 
