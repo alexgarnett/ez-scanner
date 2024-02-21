@@ -22,6 +22,11 @@ def home():
     return render_template('home.html')
 
 
+@app.route('/video')
+def video():
+    return render_template('video.html')
+
+
 @app.route('/capture')
 def stream_page():
     return render_template('stream.html')

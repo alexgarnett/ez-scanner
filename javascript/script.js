@@ -1,3 +1,5 @@
+// https://www.digitalocean.com/community/tutorials/front-and-rear-camera-access-with-javascripts-getusermedia
+
 const controls = document.querySelector('.controls');
 const cameraOptions = document.querySelector('.video-options>select');
 const video = document.querySelector('video');
