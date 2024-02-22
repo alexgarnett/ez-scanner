@@ -27,6 +27,11 @@ def video():
     return render_template('video.html')
 
 
+@app.route('/new_video')
+def new_video():
+    return render_template('new_video.html')
+
+
 @app.route('/capture')
 def stream_page():
     return render_template('stream.html')

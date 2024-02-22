@@ -71,7 +71,7 @@
           pause.classList.remove('d-none');
           return;
         }
-        if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
+        else {
           const updatedConstraints = {
             ...constraints,
             deviceId: {
