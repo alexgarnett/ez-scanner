@@ -1,4 +1,5 @@
-from flask import Flask, render_template, Response, request, jsonify, make_response
+import flask
+from flask import Flask, render_template, Response, request, jsonify, make_response, redirect
 import requests
 from process import *
 import cv2
@@ -7,6 +8,7 @@ import pytesseract.pytesseract
 import os
 import datefinder
 import base64
+import numpy
 from io import BytesIO
 from PIL import Image
 
@@ -69,20 +71,32 @@ def post_image():
     global raw_image
     image_url = request.form['data']
     starter = image_url.find(',')
-    image_data = image_url[starter + 1:]
-    raw_image = bytes(image_data, encoding="ascii")
-    decoded_image = Image.open(BytesIO(base64.b64decode(image_data)))
-    decoded_image.save('image.jpg')
+    image_string = image_url[starter + 1:]
+    # raw_image = bytes(image_data, encoding="ascii")
+    raw_image = Image.open(BytesIO(base64.b64decode(image_string)))
+    # raw_image.show()
+    # decoded_image.save('image.jpg')
     response = make_response(jsonify({'message': 'got image'}, 200))
     response.headers['Content-type'] = 'application/json'
     return response
+
+
+@app.route('/temp_write_image')
+def temp_write_image():
+    global raw_image
+    raw_image = numpy.array(raw_image)
+    raw_image = raw_image[:, :, ::-1].copy()
+    cv2.imwrite("image.jpg", raw_image)
+    return "done"
 
 
 @app.route('/display_capture')
 def display_capture():
     # Convert last raw_image to JPEG bytes and returns content type for browser
     global raw_image
-    raw_image = cv2.imread(r'image.jpg')
+    raw_image = numpy.array(raw_image)
+    raw_image = raw_image[:, :, ::-1].copy()
+    # raw_image = cv2.imread(r'image.jpg')
     flag, output_frame = cv2.imencode('.jpg', raw_image)
     image_bytes = (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' +
                    bytearray(output_frame) + b'\r\n')

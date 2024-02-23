@@ -124,9 +124,11 @@
       $.post("{{ url_for('post_image') }}",
       {
         data: screenshotImage.src
-      }
-      );
-      window.location.href = "{{ url_for('review_image') }}";
+      },
+      function() {
+        // Redirect to review_image page
+        window.location.href = "{{ url_for('review_image') }}";
+      });
     };
 
     const takePhoto = document.getElementById('takePhoto');
