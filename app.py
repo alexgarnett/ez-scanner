@@ -202,7 +202,7 @@ def display_results():
 
 
 @app.route('/processed')
-def do_processed():
+def processed():
     flag, output_frame = cv2.imencode('.jpg', raw_image)
     image_bytes = (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' +
                    bytearray(output_frame) + b'\r\n')
