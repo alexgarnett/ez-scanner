@@ -203,7 +203,8 @@ def display_results():
 
 @app.route('/processed')
 def processed():
-    flag, output_frame = cv2.imencode('.jpg', raw_image)
+    processed_image = process_capture(raw_image)
+    flag, output_frame = cv2.imencode('.jpg', processed_image)
     image_bytes = (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' +
                    bytearray(output_frame) + b'\r\n')
     return Response(image_bytes, mimetype="multipart/x-mixed-replace; boundary=frame")
