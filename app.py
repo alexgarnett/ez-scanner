@@ -95,7 +95,7 @@ def display_capture():
     # Convert last raw_image to JPEG bytes and returns content type for browser
     global raw_image
     raw_image = numpy.array(raw_image)
-    raw_image = raw_image[:, :, ::-1].copy()
+    # raw_image = raw_image[:, :, ::-1].copy()
     # raw_image = cv2.imread(r'image.jpg')
     flag, output_frame = cv2.imencode('.jpg', raw_image)
     image_bytes = (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' +
