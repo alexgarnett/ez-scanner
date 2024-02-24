@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <label for="image">Press "Choose File" to take a picture</label>
-        <input type="file" onchange="sendURL(this);" id="image" name="image" accept="image/*" capture="environment">
+    <p>Press "Choose File" to take a picture<p>
+    <input type="file" id="image" name="image" accept="image/*" capture="environment">
     <br>
     <button id="submit">Submit Photo</button>
     <script>
-        function sendURL(input) {
+        function sendURL() {
             var file = document.querySelector('input[type=file]').files[0];
             var reader = new FileReader();
 
@@ -25,5 +25,9 @@
                 reader.readAsDataURL(file);
             }
         }
+
+        const submit = document.getElementById('submit');
+        submit.onclick = sendURL;
+
     </script>
 {% endblock %}
