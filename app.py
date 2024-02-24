@@ -192,10 +192,21 @@ def extract_data(image):
 
 @app.route('/display_results')
 def display_results():
-    cv2.imwrite('capture.jpg', raw_image)
-    processed_image = process_capture(raw_image)
-    results, lines = extract_data(processed_image)
-    return render_template("results.html", results=results)
+    try:
+        cv2.imwrite('capture.jpg', raw_image)
+        processed_image = process_capture(raw_image)
+        results, lines = extract_data(processed_image)
+        return render_template("results.html", results=results)
+    except:
+        return render_template('processed.html')
+
+
+@app.route('/processed')
+def do_processed():
+    flag, output_frame = cv2.imencode('.jpg', raw_image)
+    image_bytes = (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' +
+                   bytearray(output_frame) + b'\r\n')
+    return Response(image_bytes, mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
 if __name__ == '__main__':
