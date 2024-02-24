@@ -128,6 +128,8 @@ def extract_data(image):
     # I am developing on a windows laptop, but will deploy to linux server
     if platform.system() == 'Windows':
         pytesseract.pytesseract.tesseract_cmd = r'Tesseract-OCR\tesseract.exe'
+    elif platform.system() == 'Linux':
+        pytesseract.pytesseract.tesseract_cmd = r'/usr/bin/tesseract'
     cv2.imwrite("processed_capture.jpg", image)
 
     # Get the text from the image and split it into lines
