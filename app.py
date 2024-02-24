@@ -44,6 +44,7 @@ def new_video():
 def post_image():
     global raw_image
     image_url = request.form['data']
+    print(image_url)
     starter = image_url.find(',')
     image_string = image_url[starter + 1:]
     raw_image = Image.open(BytesIO(base64.b64decode(image_string)))
