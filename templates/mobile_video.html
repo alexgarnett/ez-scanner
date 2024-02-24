@@ -4,7 +4,7 @@
     <p>Press "Choose File" to take a picture</p>
     <input type="file" id="image" name="image" accept="image/*" capture="environment">
     <br><br><br>
-    <button id="submit" onclick="sendURL()">Submit Photo</button>
+    <button id="submit" onclick="testRedirect()">Submit Photo</button>
     <script>
         function sendURL() {
             var file = document.querySelector('input[type=file]').files[0];
@@ -26,14 +26,15 @@
             }
         }
 
-<!--        function testRedirect() {-->
-<!--            window.location.href = "{{ url_for('review_image') }}";-->
-<!--        }-->
+        function testRedirect() {
+            window.location.href = "{{ url_for('review_image') }}";
+        }
 
-<!--        let clickOrTouchEvent = 'ontouchstart' in window ? 'touchstart' : 'click';-->
+
+    </script>
+    <!--        let clickOrTouchEvent = 'ontouchstart' in window ? 'touchstart' : 'click';-->
 
 <!--        document.getElementById('submit').addEventListener(clickOrTouchEvent, testRedirect());-->
 
 
-    </script>
 {% endblock %}
