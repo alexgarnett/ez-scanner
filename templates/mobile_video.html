@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+<!-- https://stackoverflow.com/questions/5802580/html-input-type-file-get-the-image-before-submitting-the-form -->
 {% block content %}
     <label for="image">Press "Choose File" to take a picture</label>
         <input type="file" onchange="readURL(this);" id="image" name="image" accept="image/*" capture="environment">

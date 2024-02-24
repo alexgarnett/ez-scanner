@@ -25,9 +25,14 @@ input[type=submit] {
     padding: 1.25vh 2.5vh;
 }
 
+button {
+    font-size: 2.5vh;
+    border-radius: 4vh;
+    padding: 1.25vh 2.5vh;
+}
+
 .center {
     margin: auto;
-    padding: 25vh 0vh;
 }
 
 .holder {
@@ -79,86 +84,4 @@ video {
   position: absolute;
   left: 20px;
   top: 30px;
-}
-
-.controls {
-  position: absolute;
-  right: 20px;
-  top: 20px;
-  display: flex;
-
-}
-
-.controls > button {
-  width: 45px;
-  height: 45px;
-  text-align: center;
-  border-radius: 100%;
-  margin: 0 6px;
-  background: transparent;
-
-  &:hover {
-    svg {
-      color: white !important;
-    }
-  }
-}
-
-
-@media (min-width: 300px) and (max-width: 400px) {
-  .controls {
-    flex-direction: column;
-
-    button {
-      margin: 5px 0 !important;
-    }
-  }
-}
-
-.controls > button > svg {
-  height: 20px;
-  width: 18px;
-  text-align: center;
-  margin: 0 auto;
-  padding: 0;
-}
-
-.controls button:nth-child(1) {
-  border: 2px solid #D2002E;
-
-  svg {
-    color: #D2002E;
-
-  }
-}
-
-.controls button:nth-child(2) {
-  border: 2px solid #008496;
-
-  svg {
-    color: #008496;
-  }
-}
-
-.controls button:nth-child(3) {
-  border: 2px solid #00B541;
-
-  svg {
-    color: #00B541;
-  }
-}
-
-.controls > button {
-  width: 45px;
-  height: 45px;
-  text-align: center;
-  border-radius: 100%;
-  margin: 0 6px;
-  background: transparent;
-
-  &:hover {
-    svg {
-      color: white;
-    }
-  }
 }
