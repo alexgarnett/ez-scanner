@@ -1,6 +1,4 @@
-import flask
 from flask import Flask, render_template, Response, request, jsonify, make_response, redirect
-import requests
 from process import *
 import cv2
 import platform
@@ -11,6 +9,7 @@ import base64
 import numpy
 from io import BytesIO
 from PIL import Image
+import user_agents
 
 # Tell Tesseract-OCR where to find its training data
 os.environ['TESSDATA_PREFIX'] = 'Tesseract-OCR/tessdata'
@@ -28,7 +27,12 @@ def home():
 
 @app.route('/video')
 def video():
-    return render_template('video.html')
+    ua_string = request.headers.get('User-Agent')
+    user_agent = user_agents.parse(ua_string)
+    if user_agent.is_mobile or user_agent.is_tablet:
+        return render_template('mobile_video.html')
+    else:
+        return render_template('video.html')
 
 
 @app.route('/new_video')
@@ -39,29 +43,6 @@ def new_video():
 @app.route('/capture')
 def stream_page():
     return render_template('stream.html')
-
-
-def generate():
-    global raw_image
-    global cam
-    global cam_on
-    cam_on = True
-    cam = cv2.VideoCapture(0)
-    while cam_on:
-        # Continuously grab frames, convert to JPEG then bytes
-        success, raw_image = cam.read()
-        flag, output_frame = cv2.imencode('.jpg', raw_image)
-        if not flag:
-            continue
-        # todo: do edge detection on the ID
-        yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' +
-               bytearray(output_frame) + b'\r\n')
-
-
-@app.route('/camera_feed')
-def camera_feed():
-    # Return the image bytes with content type for the browser to read
-    return Response(generate(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
 @app.route('/post_image', methods=["GET", "POST"])
@@ -77,15 +58,6 @@ def post_image():
     response = make_response(jsonify({'message': 'got image'}, 200))
     response.headers['Content-type'] = 'application/json'
     return response
-
-
-@app.route('/temp_write_image')
-def temp_write_image():
-    global raw_image
-    raw_image = numpy.array(raw_image)
-    raw_image = raw_image[:, :, ::-1].copy()
-    cv2.imwrite("image.jpg", raw_image)
-    return "done"
 
 
 @app.route('/display_capture')
@@ -115,14 +87,7 @@ def process_capture(image):
     return image
 
 
-def extract_data(image):
-    # Initialize the values we are hoping to extract
-    expiration = ""
-    first_name = ""
-    last_name = ""
-    issued = ""
-    address = ""
-
+def extract_lines(image):
     # I am developing on a windows laptop, but will deploy to linux server
     if platform.system() == 'Windows':
         pytesseract.pytesseract.tesseract_cmd = r'Tesseract-OCR\tesseract.exe'
@@ -133,6 +98,18 @@ def extract_data(image):
     # Get the text from the image and split it into lines
     text = pytesseract.pytesseract.image_to_string(image)
     _lines = text.split("\n")
+    return _lines
+
+
+def extract_data(image):
+    # Initialize the values we are hoping to extract
+    expiration = ""
+    first_name = ""
+    last_name = ""
+    issued = ""
+    address = ""
+
+    _lines = extract_lines(image)
     print(_lines)
 
     # Filter out blank lines
@@ -192,13 +169,14 @@ def extract_data(image):
 
 @app.route('/display_results')
 def display_results():
+    cv2.imwrite('capture.jpg', raw_image)
+    processed_image = process_capture(raw_image)
     try:
-        cv2.imwrite('capture.jpg', raw_image)
-        processed_image = process_capture(raw_image)
         results, lines = extract_data(processed_image)
         return render_template("results.html", results=results)
     except:
-        return render_template('processed.html')
+        lines = extract_lines(processed_image)
+        return render_template('ocr_failed.html', lines=lines)
 
 
 @app.route('/processed')
