@@ -17,8 +17,6 @@ os.environ['TESSDATA_PREFIX'] = 'Tesseract-OCR/tessdata'
 
 # Initialize some globals for use by webcam functions
 raw_image = None
-cam = None
-cam_on = False
 
 app = Flask(__name__)
 
@@ -95,7 +93,7 @@ def display_capture():
     # Convert last raw_image to JPEG bytes and returns content type for browser
     global raw_image
     raw_image = numpy.array(raw_image)
-    # raw_image = raw_image[:, :, ::-1].copy()
+    raw_image = raw_image[:, :, ::-1].copy()
     # raw_image = cv2.imread(r'image.jpg')
     flag, output_frame = cv2.imencode('.jpg', raw_image)
     image_bytes = (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' +
@@ -194,10 +192,6 @@ def extract_data(image):
 
 @app.route('/display_results')
 def display_results():
-    global cam
-    global cam_on
-    cam_on = False
-    # cam.release()
     cv2.imwrite('capture.jpg', raw_image)
     processed_image = process_capture(raw_image)
     results, lines = extract_data(processed_image)
