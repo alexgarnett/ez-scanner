@@ -26,8 +26,14 @@
             }
         }
 
-        const submit = document.getElementById('submit');
-        submit.onclick = sendURL;
+        function testRedirect() {
+            window.location.href = "{{ url_for('review_image') }}";
+        }
+
+        let clickOrTouchEvent = 'ontouchstart' in window ? 'touchstart' : 'click';
+
+        document.getElementById('submit').addEventListener(clickOrTouchEvent, testRedirect());
+
 
     </script>
 {% endblock %}
