@@ -2,30 +2,25 @@
 
 {% block content %}
     <label for="image">Press "Choose File" to take a picture</label>
-        <input type="file" id="image" name="image" accept="image/*" capture="environment">
+        <input type="file" onchange="readURL(this);" id="image" name="image" accept="image/*" capture="environment">
     <br>
     <button id="submit">Submit Photo</button>
     <script>
-        var canvas = document.createElement("canvas");
-
-        const sendImage = () => {
-            image = new Image();
-            image.src = document.getElementById('image');
-            image.onload = function() {
-                canvas.getContext('2d').drawImage(image, 0, 0);
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function () {
+                    $.post("{{ url_for('post_image') }}",
+                    {
+                        data: url
+                    },
+                    function() {
+                        // Redirect to review_image page
+                        window.location.href = "{{ url_for('review_image') }}";
+                    });
+                };
+                reader.readAsDataURL(input.files[0]);
             }
-
-            var url = canvas.toDataURL("image/jpeg");
-            $.post("{{ url_for('post_image') }}",
-            {
-                data: url
-            },
-            function() {
-                // Redirect to review_image page
-                window.location.href = "{{ url_for('review_image') }}";
-            });
-        };
-        const submitPhoto = document.getElementById('submit');
-        submitPhoto.onclick = sendImage;
+        }
     </script>
 {% endblock %}
