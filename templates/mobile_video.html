@@ -5,6 +5,7 @@
     <input type="file" id="image" name="image" accept="image/*" capture="environment">
     <br><br><br>
     <button id="submit" style="cursor:pointer;z-index:99;">Submit Photo</button>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
         $('#submit').on('touchstart click', function() {
             var file = document.querySelector('input[type=file]').files[0];
@@ -13,7 +14,7 @@
             reader.onloadend = function () {
                 $.post("{{ url_for('post_image') }}",
                 {
-                    data: reader.result;
+                    data: reader.result
                 },
                 function() {
                     // Redirect to review_image page
