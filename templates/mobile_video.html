@@ -7,12 +7,11 @@
     <button id="submit" style="cursor:pointer;z-index:99;">Submit Photo</button>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
-        $('#submit').on('touchstart click', async function() {
+        $('#submit').on('touchstart click', function() {
             var file = document.querySelector('input[type=file]').files[0];
             var reader = new FileReader();
 
-            if (file) {
-                await reader.readAsDataURL(file);
+            reader.onloadend = function () {
                 $.post("{{ url_for('post_image') }}",
                 {
                     data: reader.result
@@ -21,6 +20,10 @@
                     // Redirect to review_image page
                     window.location.href = "{{ url_for('review_image') }}";
                 });
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
             }
         });
 
