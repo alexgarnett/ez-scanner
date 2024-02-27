@@ -14,7 +14,7 @@ import user_agents
 # Tell Tesseract-OCR where to find its training data
 os.environ['TESSDATA_PREFIX'] = 'Tesseract-OCR/tessdata'
 
-# Initialize some globals for use by webcam functions
+# This global will hold the image as it is passed between different view functions
 raw_image = None
 
 app = Flask(__name__)
@@ -27,6 +27,7 @@ def home():
 
 @app.route('/video')
 def video():
+    # user_agents is used to tell the app whether the user is on mobile or desktop
     ua_string = request.headers.get('User-Agent')
     user_agent = user_agents.parse(ua_string)
     if user_agent.is_mobile or user_agent.is_tablet:
@@ -37,6 +38,8 @@ def video():
 
 @app.route('/post_image', methods=["GET", "POST"])
 def post_image():
+    # post_image handles the POST request from the frontend, and opens the
+    # image in the raw_image global variable
     global raw_image
     image_url = request.form['data']
     starter = image_url.find(',')
@@ -49,10 +52,12 @@ def post_image():
 
 @app.route('/display_capture')
 def display_capture():
-    # Convert last raw_image to JPEG bytes and returns content type for browser
+    # This handles returning the capture for use in the review_image endpoint
     global raw_image
+    # format raw_image for use with openCV
     raw_image = numpy.array(raw_image)
     raw_image = raw_image[:, :, ::-1].copy()
+    # convert to JPEG bytes and return content type for browser
     flag, output_frame = cv2.imencode('.jpg', raw_image)
     image_bytes = (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' +
                    bytearray(output_frame) + b'\r\n')
@@ -65,6 +70,7 @@ def review_image():
 
 
 def process_capture(image):
+    # Preprocessing functions are defined in process.py
     image = resize(image)
     image = gray(image)
     image = blur(image)
@@ -74,14 +80,15 @@ def process_capture(image):
 
 
 def extract_lines(image):
-    # I am developing on a windows laptop, but will deploy to linux server
+    # The path for tesseract executables differs by operating system
     if platform.system() == 'Windows':
         pytesseract.pytesseract.tesseract_cmd = r'Tesseract-OCR\tesseract.exe'
     elif platform.system() == 'Linux':
         pytesseract.pytesseract.tesseract_cmd = r'/usr/bin/tesseract'
-    cv2.imwrite("processed_capture.jpg", image)
+    elif platform.system() == 'Darwin':
+        pytesseract.pytesseract.tesseract_cmd = r'/usr/local/bin/tesseract'
 
-    # Get the text from the image and split it into lines
+    # Call Tesseract to get the text from the image and split it into lines
     text = pytesseract.pytesseract.image_to_string(image)
     _lines = text.split("\n")
     return _lines
@@ -104,6 +111,7 @@ def extract_data(image):
         if line != '':
             lines.append(line)
 
+    # Find the first instance of a date, which is expiration, and save the index
     exp_index = 0
     for line in lines:
         matches = list(datefinder.find_dates(line))
@@ -112,8 +120,8 @@ def extract_data(image):
             break
         else:
             exp_index += 1
-    print(exp_index)
 
+    # Use the expiration index as a reference to find the other data
     ln_line = lines[exp_index + 1]
     for char in ln_line:
         if char.isalpha() and char.isupper():
@@ -124,26 +132,12 @@ def extract_data(image):
         if char.isalpha() and char.isupper():
             first_name += char
 
-    address = lines[exp_index + 3] + " " + lines[exp_index + 4]
+    address += lines[exp_index + 3] + " " + lines[exp_index + 4]
 
     iss_line = lines[-1]
-    issued = iss_line.split(' ')[-1]
-    #     key = line[:3]
-    #     if key == "exp":
-    #         try:
-    #             expiration = dateutil.parser.parse(line)
-    #         except:
-    #             print("Expiration parsing failed. Input: " + line)
-    #     elif key == "ln ":
-    #         last_name = line[3:]
-    #     elif key == "fn ":
-    #         first_name = line[3:]
-    #
-    # last_line_split = lines[-1].split(' ')
-    # issued = last_line_split[-1]
+    issued += iss_line.split(' ')[-1]
 
-    print(lines)
-
+    # return the extracted data as a dictionary
     results = {
         'name': first_name + " " + last_name,
         'address': address,
@@ -155,8 +149,9 @@ def extract_data(image):
 
 @app.route('/display_results')
 def display_results():
-    cv2.imwrite('capture.jpg', raw_image)
     processed_image = process_capture(raw_image)
+    # If there is an exception, a different page is returned which shows the text
+    # from Tesseract, and prompts the user to try again
     try:
         results, lines = extract_data(processed_image)
         return render_template("results.html", results=results)

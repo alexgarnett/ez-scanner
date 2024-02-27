@@ -1,22 +1,22 @@
+"""
+The preprocessing functions defined in this file make use of cv2 methods.
+For documentation on the cv2 methods, please visit https://docs.opencv.org/4.x/index.html.
+"""
+
 import cv2
 import pytesseract
 import os
 import numpy as np
 import imutils
-from PIL import Image
+import platform
 
-# https://pyimagesearch.com/2021/11/22/improving-ocr-results-with-basic-image-processing/
-
-pytesseract.pytesseract.tesseract_cmd = r'Tesseract-OCR\tesseract.exe'
-os.environ['TESSDATA_PREFIX'] = 'Tesseract-OCR/tessdata'
-
-file = {
-    "name": "test.jpg",
-    "data": "data",
-    "text": "text",
-    "keys_correct": "keys",
-    "values_correct": "values"
-}
+os.environ['TESSDATA_PREFIX'] = r'Tesseract-OCR/tessdata'
+if platform.system() == 'Windows':
+    pytesseract.pytesseract.tesseract_cmd = r'Tesseract-OCR\tesseract.exe'
+elif platform.system() == 'Linux':
+    pytesseract.pytesseract.tesseract_cmd = r'/usr/bin/tesseract'
+elif platform.system() == 'Darwin':
+    pytesseract.pytesseract.tesseract_cmd = r'/usr/local/bin/tesseract'
 
 
 def extract_text(image):
@@ -105,11 +105,7 @@ def resize(image):
     height, width = image.shape[:2]
     max_height = 720
     max_width = 1080
-    if width < 1080 or height < 720:
-        pass
-        # raise Exception(f"This application does not support images of resolution "
-        #                 f"less than 1080x720. Your image is {width}x{height}.")
-    elif width > max_width or height > max_height:
+    if width > max_width or height > max_height:
         scaling_factor = max_height/float(height)
         if max_width/float(width) < scaling_factor:
             scaling_factor = max_width/float(width)
@@ -124,7 +120,6 @@ def contours(image):
 
     for c in cnts:
         (x, y, w, h) = cv2.boundingRect(c)
-        # if w >= 35 and h >= 100:
         chars.append(c)
 
         # compute the convex hull of the characters

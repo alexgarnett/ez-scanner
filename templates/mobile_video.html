@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <p>Press "Choose File" to take a picture</p>
+    <p>
+        Press "Choose File" to take a picture<br>
+        Please take the photo horizontally for best results
+    </p>
     <input type="file" id="image" name="image" accept="image/*" capture="environment">
     <br><br><br>
     <button id="submit" style="cursor:pointer;z-index:99;">Submit Photo</button>
